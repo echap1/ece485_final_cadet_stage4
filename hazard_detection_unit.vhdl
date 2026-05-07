@@ -21,9 +21,21 @@ end hazard_detection_unit;
 
 -- NOTE: only looks one instruction before dependency (not two or three before)
 architecture Behavioral of hazard_detection_unit is
-    -- declare any internal signals?
+    -- internal signals: opcodes of the current and previous instructions
+    signal opcode       : STD_LOGIC_VECTOR(6 downto 0);
+    signal if_id_opcode : STD_LOGIC_VECTOR(6 downto 0);
+
+    -- opcode constants (match control_unit.vhdl)
+    constant OPCODE_ADD       : STD_LOGIC_VECTOR(6 downto 0) := "0110011";
+    constant OPCODE_ADDI      : STD_LOGIC_VECTOR(6 downto 0) := "0010011"; -- ADDI / SUBI
+    constant OPCODE_LOAD_ADDR : STD_LOGIC_VECTOR(6 downto 0) := "0010111";
+    constant OPCODE_LW        : STD_LOGIC_VECTOR(6 downto 0) := "0000011";
+    constant OPCODE_SW        : STD_LOGIC_VECTOR(6 downto 0) := "0100011";
+    constant OPCODE_BNE       : STD_LOGIC_VECTOR(6 downto 0) := "1100011";
+    constant OPCODE_J         : STD_LOGIC_VECTOR(6 downto 0) := "1101111";
 begin
-    -- would opcodes of instructions be useful?
+    opcode       <= instr(6 downto 0);
+    if_id_opcode <= if_id_instr(6 downto 0);
 
     process(if_id_mem_read, if_id_rd, rs1, rs2, if_id_opcode, opcode, stall_counter) -- any others?)
     begin      
@@ -31,21 +43,30 @@ begin
             start_stall <= '0';
             double_stall <= '0';
         -- stall cases, dependency on a (1)load from memory, (2) load_addr
-        elsif (<what control signals and/or opcodes?>) 
-              and (<what control signals and opcodes?>) then -- single stall data dependency case
+        elsif (if_id_opcode = OPCODE_LW or         -- LW
+               if_id_opcode = OPCODE_LOAD_ADDR)    -- load_addr
+              and (
+                if_id_rd /= "00000" and
+                (rs1 = if_id_rd or rs2 = if_id_rd)
+              ) then -- single stall data dependency case
                 start_stall <= '1';
-        elsif (<what control signals and/or opcodes?>) --(3) add, (4) addi/subi
-              and (<what control signals and/or opcodes?>)  -- stall data dependency case
-              and (<what control signals and/or opcodes?>) then --BNE double stall
+                double_stall <= '0';
+        elsif (
+            if_id_opcode = OPCODE_ADD or
+            if_id_opcode = OPCODE_ADDI
+        ) --(3) add, (4) addi/subi
+              and (if_id_rd /= "00000" and (rs1 = if_id_rd or rs2 = if_id_rd))  -- stall data dependency case
+              and (opcode = OPCODE_BNE) then --BNE double stall
                     start_stall <= '1';
-                    double_stall <= '1';
+                    double_stall <= '0';
         elsif -- stall cases for branch or jump, needing time to calulate branch address, etc
-              (<what control signals and/or opcodes?>) then 
-                start_stall <= '1';  
-                double_stall <= '0';    
-        else        
+              (if_id_opcode = OPCODE_BNE or if_id_opcode = OPCODE_J) and stall_counter = 0 then
+                start_stall <= '1';
+                double_stall <= '1';
+        else
                 start_stall <= '0';
-        end if;    
-        
+                double_stall <= '0';
+        end if;
+
     end process;
 end Behavioral;
