@@ -474,7 +474,7 @@ begin
                     stall_counter <= stall_counter - 1;
              elsif start_stall = '1' then
                 if double_stall = '1' then
-                    stall_counter <= 3;  -- needed to support BNE [after previous stall]
+                    stall_counter <= 1;
                 else
                     stall_counter <= 1;
                 end if;
@@ -516,7 +516,13 @@ begin
             data_out1 => reg1_data,
             data_out2 => reg2_data
         );    
-    if_id_reg1_data <= reg1_data;  
+        
+    -- forward to the branch decision
+    if_id_reg1_data <= 
+        ex_mem_alu_result when (ex_mem_reg_write = '1' and if_id_rs1 /= "0000" and if_id_rs1 = ex_mem_rd) else
+        mem_wb_mem_data when (mem_wb_mem_read = '1' and if_id_rs1 /= "0000" and if_id_rs1 = mem_wb_rd) else
+        reg1_data;  
+        
     if_id_reg2_data <= reg2_data;
          
     -- Immediate generator
@@ -527,10 +533,10 @@ begin
             );
            
     -- Comparator 
-    not_equal_flag <= '1' when (ex_mem_reg1_data /= ex_mem_reg2_data) else '0';
+    not_equal_flag <= '1' when (if_id_reg1_data /= if_id_reg2_data) else '0';
                                         
-    next_pc <=  std_logic_vector(signed(ex_mem_npc) + signed(ex_mem_imm)) when (ex_mem_branch = '1' and not_equal_flag = '1') else -- branch case
-                std_logic_vector(signed(ex_mem_npc) + signed(ex_mem_imm)) when (ex_mem_jump = '1') else  -- jump case
+    next_pc <=  std_logic_vector(signed(if_id_npc) + signed(if_id_imm)) when (if_id_branch = '1' and not_equal_flag = '1') else -- branch case
+                std_logic_vector(signed(if_id_npc) + signed(if_id_imm)) when (if_id_jump = '1') else  -- jump case
                 pc when (start_stall = '1' or stall_counter = 3 or stall_counter = 2) else   -- stall case
                 NPC; -- note: this happens during IF !!! 1st two during MEM
                 

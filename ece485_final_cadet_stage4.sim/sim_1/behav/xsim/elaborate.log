@@ -1,0 +1,30 @@
+Vivado Simulator v2024.2.0
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+Running: /home/ethan/tools/Xilinx/Vivado/2024.2/bin/unwrapped/lnx64.o/xelab --incr --debug typical --relax --mt 8 -L xil_defaultlib -L secureip --snapshot tb_riscv_pipeline_behav xil_defaultlib.tb_riscv_pipeline -log elaborate.log 
+Using 8 slave threads.
+Starting static elaboration
+WARNING: [VRFC 10-8856] comparison between unequal length arrays always returns TRUE; left argument length 5 is different from right argument length 4 for 'std_logic_vector_93' array [/home/ethan/Documents/ECE485/stage4/ece485_final_cadet_stage4/riscv_pipeline.vhdl:522]
+WARNING: [VRFC 10-8856] comparison between unequal length arrays always returns TRUE; left argument length 5 is different from right argument length 4 for 'std_logic_vector_93' array [/home/ethan/Documents/ECE485/stage4/ece485_final_cadet_stage4/riscv_pipeline.vhdl:523]
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling package std.standard
+Compiling package std.textio
+Compiling package ieee.std_logic_1164
+Compiling package ieee.numeric_std
+Compiling architecture behavioral of entity xil_defaultlib.pc_live [pc_live_default]
+Compiling architecture behavioral of entity xil_defaultlib.pipeline_registers [pipeline_registers_default]
+Compiling architecture behavioral of entity xil_defaultlib.instr_mem [instr_mem_default]
+Compiling architecture behavioral of entity xil_defaultlib.control_unit [control_unit_default]
+Compiling architecture behavioral of entity xil_defaultlib.alu_control [alu_control_default]
+Compiling architecture behavioral of entity xil_defaultlib.hazard_detection_unit [hazard_detection_unit_default]
+Compiling architecture behavioral of entity xil_defaultlib.forwarding_unit [forwarding_unit_default]
+Compiling architecture behavioral of entity xil_defaultlib.reg_file [reg_file_default]
+Compiling architecture behavioral of entity xil_defaultlib.immediate_generator [immediate_generator_default]
+Compiling architecture behavioral of entity xil_defaultlib.alu [alu_default]
+Compiling architecture behavioral of entity xil_defaultlib.data_mem [data_mem_default]
+Compiling architecture behavioral of entity xil_defaultlib.riscv_pipeline [riscv_pipeline_default]
+Compiling architecture behavioral of entity xil_defaultlib.tb_riscv_pipeline
+Built simulation snapshot tb_riscv_pipeline_behav
